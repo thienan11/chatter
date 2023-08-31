@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef, useState} from 'react';
 import './App.css';
 
 // firebase sdk
@@ -33,13 +33,14 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        
+        <h1>Chatter</h1>
+        <SignOut/>
       </header>
       
       <section>
-        
         {user ? <Chat /> : <SignIn />}
       </section>
+
     </div>
   );
 }
@@ -51,7 +52,7 @@ function SignIn() {
   }
 
   return (
-    <button onClick={signInWithGoogle}>Sign in with Google</button>
+    <button onClick={signInWithGoogle} className='sign-in'>Sign in with Google</button>
   )
 }
 
@@ -63,6 +64,9 @@ function SignOut() {
 }
 
 function Chat(){
+
+  const dummy = useRef();
+
   // reference a firestore collection (in this case, messages)
   const messageRef = firestore.collection('messages');
   // query documents in the messages collection
@@ -73,17 +77,41 @@ function Chat(){
 
   const[formValue, setFormValue] = useState('');
 
+  const sendMsg = async(e) => {
+    // prevent page refresh
+    e.preventDefault();
+    // get user id from current logged in user
+    const {uid, photoURL} = auth.currentUser;
+
+    // create new document in database
+    await messageRef.add({
+      text: formValue,
+      created: firebase.firestore.FieldValue.serverTimestamp(),
+      uid,
+      photoURL
+    });
+
+    // after, set form value back to empty string
+    setFormValue('');
+
+    // scroll into view whenever a user sends a message
+    dummy.current.scrollIntoView({behavior: 'smooth'});
+  }
+
   return (
     <>
-      <div>
+      <main>
         {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
-      </div>
+      
+        <span ref={dummy}></span>
 
-      <form onSubmit={sendMessage}>
+      </main>
+    
+      <form onSubmit={sendMsg}>
         {/* bind state to form input */}
-        <input value={formValue} onChange={(e) => setFormValue(e.target.value)} placeholder="no cussing pls" />
+        <input value={formValue} onChange={(e) => setFormValue(e.target.value)} placeholder="Send a message" />
         
-        <button type="submit">SEND</button>
+        <button type="submit">💬</button>
 
       </form>
     </>
@@ -92,7 +120,7 @@ function Chat(){
 
 function ChatMessage(props) {
   // find chat message child component, show actual text
-  const {text, uid} = props.message;
+  const {text, uid, photoURL} = props.message;
 
   // distinguish between messages that were sent and received
   // compare user id on firestore document and currently logged in user, if equal, current user sent them
@@ -100,11 +128,12 @@ function ChatMessage(props) {
 
 
   return (
+    <>
     <div className={`message ${messageClass}`}>
       <img src={photoURL}/>
       <p>{text}</p>
     </div>
-  
+    </>
   )
 }
 
