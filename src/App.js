@@ -9,6 +9,9 @@ import 'firebase/compat/auth';
 // hooks
 import {useAuthState} from 'react-firebase-hooks/auth';
 import {useCollectionData} from 'react-firebase-hooks/firestore';
+import { findAllInRenderedTree } from 'react-dom/test-utils';
+
+import logo from './images/bird (1).png'
 
 // identify project
 firebase.initializeApp({
@@ -24,6 +27,7 @@ firebase.initializeApp({
 
 const auth = firebase.auth();
 const firestore = firebase.firestore();
+const numUsrs = firestore.collection('messages');
 
 function App() {
 
@@ -34,6 +38,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Chatter</h1>
+        <img src={logo}/>
         <SignOut/>
       </header>
       
@@ -64,7 +69,7 @@ function SignOut() {
 }
 
 function Chat(){
-
+  
   const dummy = useRef();
 
   // reference a firestore collection (in this case, messages)
@@ -77,6 +82,8 @@ function Chat(){
 
   const[formValue, setFormValue] = useState('');
 
+  const n = auth.currentUser.displayName;
+
   const sendMsg = async(e) => {
     // prevent page refresh
     e.preventDefault();
@@ -88,7 +95,8 @@ function Chat(){
       text: formValue,
       created: firebase.firestore.FieldValue.serverTimestamp(),
       uid,
-      photoURL
+      photoURL,
+      n
     });
 
     // after, set form value back to empty string
@@ -120,7 +128,7 @@ function Chat(){
 
 function ChatMessage(props) {
   // find chat message child component, show actual text
-  const {text, uid, photoURL} = props.message;
+  const {text, uid, photoURL, n} = props.message;
 
   // distinguish between messages that were sent and received
   // compare user id on firestore document and currently logged in user, if equal, current user sent them

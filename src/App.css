@@ -65,7 +65,7 @@ form {
   height: 10vh;
   position: fixed;
   bottom: 0;
-  background-color: rgb(24, 23, 23);
+  background-color: rgb(17, 15, 25);
   width: 100%;
   /* max-width: 728px; */
   display: flex;
@@ -128,7 +128,7 @@ p {
   margin-bottom: 12px;
   line-height: 24px;
   padding: 10px 20px;
-  border-radius: 25px;
+  border-radius: 5px;
   position: relative;
   color: white;
   text-align: center;
@@ -149,6 +149,7 @@ p {
   background: #0b93f6;
   align-self: flex-end;
 }
+
 .received p {
   background: #e5e5ea;
   color: black;
@@ -159,4 +160,9 @@ img {
   height: 40px;
   border-radius: 50%;
   margin: 2px 5px;
+}
+
+.name {
+  color: white;
+  
 }
