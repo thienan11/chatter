@@ -26,6 +26,22 @@ body {
   box-sizing: border-box;
 }
 
+/* You may need to adjust the width and padding based on your design */
+
+.App header h1 {
+  margin: 0;
+  padding: 0 10px; /* Add padding to create space between h1 and img */
+}
+
+/* Adjust the img styles as needed */
+
+.App header img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-left: 10px; /* Add margin for spacing */
+}
+
 .App header button {
   border-radius: 50px;
 }
@@ -163,6 +179,13 @@ img {
 }
 
 .name {
+  display: flex;
+  align-items: center;
+}
+
+.name p {
   color: white;
-  
+  border-radius: 0%;
+  background: none;
+  height: 0px;
 }

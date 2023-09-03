@@ -37,9 +37,15 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Chatter</h1>
-        <img src={logo}/>
-        <SignOut/>
+        <div>
+          <h1>Chatter</h1>
+          <img src={logo} alt="chatter icon"/>
+        </div>
+
+        <div className='right-header'>
+          <SignOut/>
+        </div>
+
       </header>
       
       <section>
@@ -137,6 +143,9 @@ function ChatMessage(props) {
 
   return (
     <>
+    <div className={`name ${messageClass}`}>
+      <p>{n}</p>
+    </div>
     <div className={`message ${messageClass}`}>
       <img src={photoURL}/>
       <p>{text}</p>
