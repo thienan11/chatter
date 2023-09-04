@@ -189,3 +189,11 @@ img {
   background: none;
   height: 0px;
 }
+
+.sentN {
+  align-self: flex-end;
+}
+
+.receivedN {
+  align-self: flex-start;
+}

@@ -99,7 +99,8 @@ function Chat(){
     // create new document in database
     await messageRef.add({
       text: formValue,
-      created: firebase.firestore.FieldValue.serverTimestamp(),
+      // created: firebase.firestore.FieldValue.serverTimestamp(),
+      created: firebase.firestore.Timestamp.fromDate(new Date()),
       uid,
       photoURL,
       n
@@ -134,17 +135,19 @@ function Chat(){
 
 function ChatMessage(props) {
   // find chat message child component, show actual text
-  const {text, uid, photoURL, n} = props.message;
+  const {text, uid, photoURL, n, created} = props.message;
+  const ts = (created.seconds + created.nanoseconds/1000000000) * 1000;
+  const d = new Date(ts).toLocaleTimeString();
 
   // distinguish between messages that were sent and received
   // compare user id on firestore document and currently logged in user, if equal, current user sent them
   const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
-
+  const tagClass = uid === auth.currentUser.uid ? 'sentN' : 'receivedN';
 
   return (
     <>
-    <div className={`name ${messageClass}`}>
-      <p>{n}</p>
+    <div className={`name ${tagClass}`}>
+      <p>{n} | {d}</p>
     </div>
     <div className={`message ${messageClass}`}>
       <img src={photoURL}/>
