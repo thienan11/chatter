@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import './App.css';
 
 // firebase sdk
@@ -90,6 +90,8 @@ function Chat(){
 
   const n = auth.currentUser.displayName;
 
+  const [prevDate, setPrevDate] = useState('');
+  
   const sendMsg = async(e) => {
     // prevent page refresh
     e.preventDefault();
@@ -109,15 +111,30 @@ function Chat(){
     // after, set form value back to empty string
     setFormValue('');
 
-    // scroll into view whenever a user sends a message
+    // scroll into view whenever a user sends a message (prob not needed bc of useEffect)
     dummy.current.scrollIntoView({behavior: 'smooth'});
   }
+
+  // Scroll to the bottom of the chat whenever messages change
+  useEffect(() => {
+    if (dummy.current) {
+      dummy.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   return (
     <>
       <main>
-        {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
-      
+        {/* {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)} */}
+        {messages &&
+          messages.map((msg, index) => (
+            <ChatMessage
+              key={msg.id}
+              message={msg}
+              prevMessage={messages[index - 1]}
+            />
+          ))}
+
         <span ref={dummy}></span>
 
       </main>
@@ -136,16 +153,43 @@ function Chat(){
 function ChatMessage(props) {
   // find chat message child component, show actual text
   const {text, uid, photoURL, n, created} = props.message;
-  const ts = (created.seconds + created.nanoseconds/1000000000) * 1000;
-  const d = new Date(ts).toLocaleTimeString();
+  // const ts = (created.seconds + created.nanoseconds/1000000000) * 1000;
+  const ts = created.toDate();
+  const d = ts.toLocaleTimeString();
 
   // distinguish between messages that were sent and received
   // compare user id on firestore document and currently logged in user, if equal, current user sent them
   const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
   const tagClass = uid === auth.currentUser.uid ? 'sentN' : 'receivedN';
 
+  const formattedDate = ts.toLocaleDateString();
+
+  // // State to track the previous date
+  // const [prevDate, setPrevDate] = useState('');
+
+  // // Check if it's a new day and display the date accordingly
+  // let messageDate = '';
+  // if (formattedDate !== prevDate) {
+  //   messageDate = formattedDate;
+  //   setPrevDate(formattedDate);
+  // }
+  
+  // console.log('formattedDate:', formattedDate);
+  // console.log('prevDate:', prevDate);
+
+  // Compare the current message's date with the previous message's date
+  const isDifferentDay =
+    !props.prevMessage ||
+    formattedDate !==
+      new Date(props.prevMessage.created.toDate()).toLocaleDateString();
+
   return (
     <>
+    {isDifferentDay && (
+        <div className="message-date">
+          <p>{formattedDate}</p>
+        </div>
+      )}
     <div className={`name ${tagClass}`}>
       <p>{n} | {d}</p>
     </div>

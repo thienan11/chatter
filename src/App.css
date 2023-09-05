@@ -197,3 +197,7 @@ img {
 .receivedN {
   align-self: flex-start;
 }
+
+.message-date {
+  align-self: center;
+}
