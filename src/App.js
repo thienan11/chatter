@@ -62,7 +62,10 @@ function SignIn() {
   }
 
   return (
-    <button onClick={signInWithGoogle} className='sign-in'>Sign in with Google</button>
+    <div className='signin-wall'>
+      <p>Sign in to join the chat</p>
+      <button onClick={signInWithGoogle} className='sign-in'>Sign in with Google</button>
+    </div>
   )
 }
 
@@ -150,6 +153,7 @@ function Chat(){
 function ChatMessage(props) {
   // find chat message child component, show actual text
   const {text, uid, photoURL, n, created} = props.message;
+
   // const ts = (created.seconds + created.nanoseconds/1000000000) * 1000;
   const ts = created.toDate();
   const d = ts.toLocaleTimeString([], {
@@ -161,7 +165,7 @@ function ChatMessage(props) {
   const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
   const tagClass = uid === auth.currentUser.uid ? 'sentN' : 'receivedN';
 
-
+  // formatting dates
   const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
 
   const currentDate = new Date().toLocaleDateString('en-us', options);
