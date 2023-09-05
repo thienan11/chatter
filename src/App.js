@@ -9,7 +9,6 @@ import 'firebase/compat/auth';
 // hooks
 import {useAuthState} from 'react-firebase-hooks/auth';
 import {useCollectionData} from 'react-firebase-hooks/firestore';
-import { findAllInRenderedTree } from 'react-dom/test-utils';
 
 import logo from './images/bird (1).png'
 
@@ -89,8 +88,6 @@ function Chat(){
   const[formValue, setFormValue] = useState('');
 
   const n = auth.currentUser.displayName;
-
-  const [prevDate, setPrevDate] = useState('');
   
   const sendMsg = async(e) => {
     // prevent page refresh
@@ -155,46 +152,47 @@ function ChatMessage(props) {
   const {text, uid, photoURL, n, created} = props.message;
   // const ts = (created.seconds + created.nanoseconds/1000000000) * 1000;
   const ts = created.toDate();
-  const d = ts.toLocaleTimeString();
+  const d = ts.toLocaleTimeString([], {
+    timeStyle: 'short'
+  });
 
   // distinguish between messages that were sent and received
   // compare user id on firestore document and currently logged in user, if equal, current user sent them
   const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
   const tagClass = uid === auth.currentUser.uid ? 'sentN' : 'receivedN';
 
-  const formattedDate = ts.toLocaleDateString();
 
-  // // State to track the previous date
-  // const [prevDate, setPrevDate] = useState('');
+  const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
 
-  // // Check if it's a new day and display the date accordingly
-  // let messageDate = '';
-  // if (formattedDate !== prevDate) {
-  //   messageDate = formattedDate;
-  //   setPrevDate(formattedDate);
-  // }
+  const currentDate = new Date().toLocaleDateString('en-us', options);
   
-  // console.log('formattedDate:', formattedDate);
-  // console.log('prevDate:', prevDate);
+  let formattedDate = ts.toLocaleDateString('en-us', options);
 
   // Compare the current message's date with the previous message's date
   const isDifferentDay =
     !props.prevMessage ||
     formattedDate !==
-      new Date(props.prevMessage.created.toDate()).toLocaleDateString();
+      new Date(props.prevMessage.created.toDate()).toLocaleDateString('en-us', options);
 
+  // Change date header if the message is sent today
+  if (formattedDate === currentDate) {
+    formattedDate = "Today - " + currentDate;
+  }
+  
   return (
     <>
     {isDifferentDay && (
         <div className="message-date">
           <p>{formattedDate}</p>
         </div>
-      )}
+    )}
+
     <div className={`name ${tagClass}`}>
       <p>{n} | {d}</p>
     </div>
+
     <div className={`message ${messageClass}`}>
-      <img src={photoURL}/>
+      <img src={photoURL} alt="profile pic"/>
       <p>{text}</p>
     </div>
     </>
